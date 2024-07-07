@@ -10,9 +10,9 @@ import (
 )
 
 func print_message(x, y int, foreground, background termbox.Attribute, msg string) {
-	for _, c := range msg {
-		termbox.SetCell(x, y, c, foreground, background)
-		x += runewidth.RuneWidth(c)
+	for _, ch := range msg {
+		termbox.SetCell(x, y, ch, foreground, background)
+		x += runewidth.RuneWidth(ch)
 	}
 }
 
