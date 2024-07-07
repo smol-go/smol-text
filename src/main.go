@@ -23,39 +23,44 @@ func run_editor() {
 		os.Exit(1)
 	}
 
-	asciiArt := `
-		███████╗███╗   ███╗ ██████╗ ██╗  ████████╗███████╗██╗  ██╗████████╗
-		██╔════╝████╗ ████║██╔═══██╗██║  ╚══██╔══╝██╔════╝╚██╗██╔╝╚══██╔══╝
-		███████╗██╔████╔██║██║   ██║██║     ██║   █████╗   ╚███╔╝    ██║   
-		╚════██║██║╚██╔╝██║██║   ██║██║     ██║   ██╔══╝   ██╔██╗    ██║   
-		███████║██║ ╚═╝ ██║╚██████╔╝███████╗██║   ███████╗██╔╝ ██╗   ██║   
-		╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚══════╝╚═╝  ╚═╝   ╚═╝ 
-	`
+	for {
+		asciiArt := `
+			███████╗███╗   ███╗ ██████╗ ██╗  ████████╗███████╗██╗  ██╗████████╗
+			██╔════╝████╗ ████║██╔═══██╗██║  ╚══██╔══╝██╔════╝╚██╗██╔╝╚══██╔══╝
+			███████╗██╔████╔██║██║   ██║██║     ██║   █████╗   ╚███╔╝    ██║   
+			╚════██║██║╚██╔╝██║██║   ██║██║     ██║   ██╔══╝   ██╔██╗    ██║   
+			███████║██║ ╚═╝ ██║╚██████╔╝███████╗██║   ███████╗██╔╝ ██╗   ██║   
+			╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚══════╝╚═╝  ╚═╝   ╚═╝ 
+		`
 
-	lines := strings.Split(asciiArt, "\n")
+		lines := strings.Split(asciiArt, "\n")
 
-	maxWidth := 0
-	for _, line := range lines {
-		width := runewidth.StringWidth(line)
-		if width > maxWidth {
-			maxWidth = width
+		maxWidth := 0
+		for _, line := range lines {
+			width := runewidth.StringWidth(line)
+			if width > maxWidth {
+				maxWidth = width
+			}
+		}
+
+		message := "A simple text editor written in golang"
+
+		// calculating the starting x position for message
+		startX := (maxWidth - runewidth.StringWidth(message)) / 2
+
+		for i, line := range lines {
+			print_message(0, i, termbox.ColorCyan, termbox.ColorDefault, line)
+		}
+
+		print_message(startX, len(lines), termbox.ColorCyan, termbox.ColorDefault, message)
+
+		termbox.Flush()
+		event := termbox.PollEvent()
+		if event.Type == termbox.EventKey && event.Key == termbox.KeyEsc {
+			termbox.Close()
+			break
 		}
 	}
-
-	message := "A simple text editor written in golang"
-
-	// calculating the starting x position for message
-	startX := (maxWidth - runewidth.StringWidth(message)) / 2
-
-	for i, line := range lines {
-		print_message(0, i, termbox.ColorCyan, termbox.ColorDefault, line)
-	}
-
-	print_message(startX, len(lines), termbox.ColorCyan, termbox.ColorDefault, message)
-
-	termbox.Flush()
-	termbox.PollEvent()
-	termbox.Close()
 }
 
 func main() {
