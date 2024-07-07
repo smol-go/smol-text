@@ -39,10 +39,10 @@ func display_text_buffer() {
 				} else {
 					termbox.SetCell(col, row, rune(' '), termbox.ColorDefault, termbox.ColorGreen)
 				}
-			} else if row+OFFSET_Y > len(text_buffer) {
+			} else if row+OFFSET_Y > len(text_buffer)-1 {
 				termbox.SetCell(0, row, rune('*'), termbox.ColorBlue, termbox.ColorDefault)
-				termbox.SetChar(col, row, rune('\n'))
 			}
+			termbox.SetChar(col, row, rune('\n'))
 		}
 	}
 }
