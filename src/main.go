@@ -9,10 +9,41 @@ import (
 	"github.com/nsf/termbox-go"
 )
 
-func print_message(x, y int, foreground, background termbox.Attribute, msg string) {
+// to store the width and height of the terminal
+var ROWS, COLS int
+
+// to store the scoll
+var OFFSET_X, OFFSET_Y int
+
+var text_buffer = [][]rune{
+	{'h', 'e', 'l', 'l', 'o'},
+	{'w', 'o', 'r', 'l', 'd'},
+}
+
+func print_message(row, col int, foreground, background termbox.Attribute, msg string) {
 	for _, ch := range msg {
-		termbox.SetCell(x, y, ch, foreground, background)
-		x += runewidth.RuneWidth(ch)
+		termbox.SetCell(row, col, ch, foreground, background)
+		row += runewidth.RuneWidth(ch)
+	}
+}
+
+func display_text_buffer() {
+	var row, col int
+	for row = 0; row < ROWS; row++ {
+		text_buffer_row := row + OFFSET_Y
+		for col = 0; col < COLS; col++ {
+			text_buffer_col := col + OFFSET_X
+			if text_buffer_row >= 0 && text_buffer_row < len(text_buffer) && text_buffer_col < len(text_buffer[text_buffer_row]) {
+				if text_buffer[text_buffer_row][text_buffer_col] != '\t' {
+					termbox.SetChar(col, row, text_buffer[text_buffer_row][text_buffer_col])
+				} else {
+					termbox.SetCell(col, row, rune(' '), termbox.ColorDefault, termbox.ColorGreen)
+				}
+			} else if row+OFFSET_Y > len(text_buffer) {
+				termbox.SetCell(0, row, rune('*'), termbox.ColorBlue, termbox.ColorDefault)
+				termbox.SetChar(col, row, rune('\n'))
+			}
+		}
 	}
 }
 
@@ -27,10 +58,10 @@ func run_editor() {
 		asciiArt := `
 			███████╗███╗   ███╗ ██████╗ ██╗  ████████╗███████╗██╗  ██╗████████╗
 			██╔════╝████╗ ████║██╔═══██╗██║  ╚══██╔══╝██╔════╝╚██╗██╔╝╚══██╔══╝
-			███████╗██╔████╔██║██║   ██║██║     ██║   █████╗   ╚███╔╝    ██║   
-			╚════██║██║╚██╔╝██║██║   ██║██║     ██║   ██╔══╝   ██╔██╗    ██║   
-			███████║██║ ╚═╝ ██║╚██████╔╝███████╗██║   ███████╗██╔╝ ██╗   ██║   
-			╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚══════╝╚═╝  ╚═╝   ╚═╝ 
+			███████╗██╔████╔██║██║   ██║██║     ██║   █████╗   ╚███╔╝    ██║
+			╚════██║██║╚██╔╝██║██║   ██║██║     ██║   ██╔══╝   ██╔██╗    ██║
+			███████║██║ ╚═╝ ██║╚██████╔╝███████╗██║   ███████╗██╔╝ ██╗   ██║
+			╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚══════╝╚═╝  ╚═╝   ╚═╝
 		`
 
 		lines := strings.Split(asciiArt, "\n")
@@ -54,6 +85,13 @@ func run_editor() {
 
 		print_message(startX, len(lines), termbox.ColorCyan, termbox.ColorDefault, message)
 
+		COLS, ROWS = termbox.Size()
+		ROWS--
+		if COLS < 78 {
+			COLS = 78
+		}
+		// termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+		// display_text_buffer()
 		termbox.Flush()
 		event := termbox.PollEvent()
 		if event.Type == termbox.EventKey && event.Key == termbox.KeyEsc {
