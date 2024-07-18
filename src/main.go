@@ -143,6 +143,41 @@ func display_status_bar() {
 	print_message(0, ROWS, termbox.ColorBlack, termbox.ColorWhite, message)
 }
 
+func get_key() termbox.Event {
+	var key_event termbox.Event
+
+	switch event := termbox.PollEvent(); event.Type {
+	case termbox.EventKey:
+		key_event = event
+	case termbox.EventError:
+		panic(event.Err)
+	}
+
+	return key_event
+}
+
+func process_keypress() {
+	key_event := get_key()
+
+	if key_event.Key == termbox.KeyEsc {
+		termbox.Close()
+		os.Exit(0)
+	} else if key_event.Ch != 0 {
+		// do it later
+	} else {
+		switch key_event.Key {
+		case termbox.KeyArrowUp:
+			if CURRENT_ROW != 0 {
+				CURRENT_ROW--
+			}
+		case termbox.KeyArrowDown:
+			if CURRENT_ROW < len(text_buffer)-1 {
+				CURRENT_ROW++
+			}
+		}
+	}
+}
+
 func run_editor() {
 	err := termbox.Init()
 	if err != nil {
@@ -199,11 +234,7 @@ func run_editor() {
 		display_status_bar()
 		termbox.SetCursor(CURRENT_COL-OFFSET_COL, CURRENT_ROW-OFFSET_ROW)
 		termbox.Flush()
-		event := termbox.PollEvent()
-		if event.Type == termbox.EventKey && event.Key == termbox.KeyEsc {
-			termbox.Close()
-			break
-		}
+		process_keypress()
 	}
 }
 
