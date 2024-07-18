@@ -189,6 +189,10 @@ func process_keypress() {
 				CURRENT_COL = 0
 			}
 		}
+
+		if CURRENT_COL > len(text_buffer[CURRENT_ROW]) {
+			CURRENT_COL = len(text_buffer[CURRENT_ROW])
+		}
 	}
 }
 
