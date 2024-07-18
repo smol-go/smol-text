@@ -174,6 +174,20 @@ func process_keypress() {
 			if CURRENT_ROW < len(text_buffer)-1 {
 				CURRENT_ROW++
 			}
+		case termbox.KeyArrowLeft:
+			if CURRENT_COL != 0 {
+				CURRENT_COL--
+			} else if CURRENT_ROW > 0 {
+				CURRENT_ROW--
+				CURRENT_COL = len(text_buffer[CURRENT_ROW])
+			}
+		case termbox.KeyArrowRight:
+			if CURRENT_COL < len(text_buffer[CURRENT_ROW]) {
+				CURRENT_COL++
+			} else if CURRENT_ROW < len(text_buffer)-1 {
+				CURRENT_ROW++
+				CURRENT_COL = 0
+			}
 		}
 	}
 }
