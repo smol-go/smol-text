@@ -166,6 +166,18 @@ func process_keypress() {
 		// do it later
 	} else {
 		switch key_event.Key {
+		case termbox.KeyHome:
+			CURRENT_COL = 0
+		case termbox.KeyEnd:
+			CURRENT_COL = len(text_buffer[CURRENT_ROW])
+		case termbox.KeyPgup:
+			if CURRENT_ROW-int(ROWS/4) > 0 {
+				CURRENT_ROW -= int(ROWS / 4)
+			}
+		case termbox.KeyPgdn:
+			if CURRENT_ROW+int(ROWS/4) < len(text_buffer)-1 {
+				CURRENT_ROW += int(ROWS / 4)
+			}
 		case termbox.KeyArrowUp:
 			if CURRENT_ROW != 0 {
 				CURRENT_ROW--
