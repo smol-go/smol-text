@@ -18,7 +18,7 @@ var mode int
 var ROWS, COLS int
 
 // to store the scoll
-var OFFSET_X, OFFSET_Y int
+var OFFSET_COL, OFFSET_ROW int
 
 // current cursor position
 var CURRENT_COL, CURRENT_ROW int
@@ -66,19 +66,34 @@ func read_file(filename string) {
 	}
 }
 
+func scroll_text_buffer() {
+	if CURRENT_ROW < OFFSET_ROW {
+		OFFSET_ROW = CURRENT_ROW
+	}
+	if CURRENT_COL < OFFSET_COL {
+		OFFSET_COL = CURRENT_COL
+	}
+	if CURRENT_ROW >= OFFSET_ROW+ROWS {
+		OFFSET_ROW = CURRENT_ROW - ROWS + 1
+	}
+	if CURRENT_COL >= OFFSET_COL+COLS {
+		OFFSET_COL = CURRENT_COL - COLS + 1
+	}
+}
+
 func display_text_buffer() {
 	var row, col int
 	for row = 0; row < ROWS; row++ {
-		text_buffer_row := row + OFFSET_Y
+		text_buffer_row := row + OFFSET_ROW
 		for col = 0; col < COLS; col++ {
-			text_buffer_col := col + OFFSET_X
+			text_buffer_col := col + OFFSET_COL
 			if text_buffer_row >= 0 && text_buffer_row < len(text_buffer) && text_buffer_col < len(text_buffer[text_buffer_row]) {
 				if text_buffer[text_buffer_row][text_buffer_col] != '\t' {
 					termbox.SetChar(col, row, text_buffer[text_buffer_row][text_buffer_col])
 				} else {
 					termbox.SetCell(col, row, rune(' '), termbox.ColorDefault, termbox.ColorGreen)
 				}
-			} else if row+OFFSET_Y > len(text_buffer)-1 {
+			} else if row+OFFSET_ROW > len(text_buffer)-1 {
 				termbox.SetCell(0, row, rune('*'), termbox.ColorBlue, termbox.ColorDefault)
 			}
 			termbox.SetChar(col, row, rune('\n'))
@@ -179,7 +194,10 @@ func run_editor() {
 			COLS = 78
 		}
 		termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+		scroll_text_buffer()
 		display_text_buffer()
+		display_status_bar()
+		termbox.SetCursor(CURRENT_COL-OFFSET_COL, CURRENT_ROW-OFFSET_ROW)
 		termbox.Flush()
 		event := termbox.PollEvent()
 		if event.Type == termbox.EventKey && event.Key == termbox.KeyEsc {
