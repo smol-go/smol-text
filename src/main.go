@@ -83,6 +83,37 @@ func insert_rune(event termbox.Event) {
 	CURRENT_COL++
 }
 
+func delete_rune() {
+	if CURRENT_COL > 0 {
+		CURRENT_COL--
+		delete_line := make([]rune, len(text_buffer[CURRENT_ROW])-1)
+
+		copy(delete_line[:CURRENT_COL], text_buffer[CURRENT_ROW][:CURRENT_COL])
+		copy(delete_line[CURRENT_COL:], text_buffer[CURRENT_ROW][CURRENT_COL+1:])
+
+		text_buffer[CURRENT_ROW] = delete_line
+	} else if CURRENT_ROW > 0 {
+		append_line := make([]rune, len(text_buffer[CURRENT_ROW]))
+
+		copy(append_line, text_buffer[CURRENT_ROW][CURRENT_COL:])
+
+		new_text_buffer := make([][]rune, len(text_buffer)-1)
+
+		copy(new_text_buffer[:CURRENT_ROW], text_buffer[:CURRENT_ROW])
+		copy(new_text_buffer[CURRENT_ROW:], text_buffer[CURRENT_ROW+1:])
+
+		text_buffer = new_text_buffer
+		CURRENT_ROW--
+		CURRENT_COL = len(text_buffer[CURRENT_ROW])
+		insert_line := make([]rune, len(text_buffer[CURRENT_ROW])+len(append_line))
+
+		copy(insert_line[:len(text_buffer[CURRENT_ROW])], text_buffer[CURRENT_ROW])
+		copy(insert_line[len(text_buffer[CURRENT_ROW]):], append_line)
+
+		text_buffer[CURRENT_ROW] = insert_line
+	}
+}
+
 func scroll_text_buffer() {
 	if CURRENT_ROW < OFFSET_ROW {
 		OFFSET_ROW = CURRENT_ROW
@@ -193,6 +224,12 @@ func process_keypress() {
 		}
 	} else {
 		switch key_event.Key {
+		case termbox.KeyBackspace:
+			delete_rune()
+			modified = true
+		case termbox.KeyBackspace2:
+			delete_rune()
+			modified = true
 		case termbox.KeyTab:
 			if mode == 1 {
 				for i := 0; i < 4; i++ {
