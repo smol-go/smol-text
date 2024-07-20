@@ -160,6 +160,43 @@ func insert_line() {
 	text_buffer = new_text_buffer
 }
 
+func copy_line() {
+	copy_line := make([]rune, len(text_buffer[CURRENT_ROW]))
+	copy(copy_line, text_buffer[CURRENT_ROW])
+	copy_buffer = copy_line
+}
+
+func cut_line() {
+	copy_line()
+	if CURRENT_ROW >= len(text_buffer) || len(text_buffer) < 2 {
+		return
+	}
+
+	new_text_buffer := make([][]rune, len(text_buffer)-1)
+
+	copy(new_text_buffer[:CURRENT_ROW], text_buffer[:CURRENT_ROW])
+	copy(new_text_buffer[CURRENT_ROW:], text_buffer[CURRENT_ROW+1:])
+
+	text_buffer = new_text_buffer
+	if CURRENT_ROW > 0 {
+		CURRENT_ROW--
+		CURRENT_COL = 0
+	}
+}
+
+func paste_line() {
+	if len(copy_buffer) == 0 {
+		CURRENT_ROW++
+		CURRENT_COL = 0
+	}
+
+	new_text_buffer := make([][]rune, len(text_buffer)+1)
+	copy(new_text_buffer[:CURRENT_ROW], text_buffer[:CURRENT_ROW])
+	new_text_buffer[CURRENT_ROW] = copy_buffer
+	copy(new_text_buffer[CURRENT_ROW+1:], text_buffer[CURRENT_ROW:])
+	text_buffer = new_text_buffer
+}
+
 func scroll_text_buffer() {
 	if CURRENT_ROW < OFFSET_ROW {
 		OFFSET_ROW = CURRENT_ROW
@@ -268,6 +305,12 @@ func process_keypress() {
 				mode = 1
 			case 'w':
 				write_file(source_file)
+			case 'c':
+				copy_line()
+			case 'p':
+				paste_line()
+			case 'd':
+				cut_line()
 			}
 		}
 	} else {
