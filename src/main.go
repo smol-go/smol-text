@@ -197,6 +197,19 @@ func paste_line() {
 	text_buffer = new_text_buffer
 }
 
+func push_buffer() {
+	copy_undo_buffer := make([][]rune, len(text_buffer))
+	copy(copy_undo_buffer, text_buffer)
+	undo_buffer = copy_undo_buffer
+}
+
+func pull_buffer() {
+	if len(undo_buffer) == 0 {
+		return
+	}
+	text_buffer = undo_buffer
+}
+
 func scroll_text_buffer() {
 	if CURRENT_ROW < OFFSET_ROW {
 		OFFSET_ROW = CURRENT_ROW
@@ -311,6 +324,10 @@ func process_keypress() {
 				paste_line()
 			case 'd':
 				cut_line()
+			case 's':
+				push_buffer()
+			case 'l':
+				pull_buffer()
 			}
 		}
 	} else {
