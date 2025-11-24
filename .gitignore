@@ -1,0 +1,8 @@
+# Binaries
+smol-text
+*.exe
+
+# Go
+*.test
+*.out
+vendor/

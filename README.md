@@ -1,5 +1,8 @@
-A simple text editor written in golang
+# smol-text
 
-```
-bash build.sh
+A minimal text editor built in Go.
+
+## Installation
+```bash
+go build -o smol-text
 ```
